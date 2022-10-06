@@ -73,3 +73,24 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('wishlist:login'))
     response.delete_cookie('last_login')
     return response
+
+
+@login_required(login_url='/wishlist/login/')
+def show_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    context = {
+    'list_barang': data_barang_wishlist,
+    'nama': 'Salma Hanifah Hidayanti',
+    'last_login': request.COOKIES['last_login'],
+    }
+    return render(request, "wishlist_ajax.html", context)
+
+def submit_ajax(request):
+    if request.method == 'POST':
+        newItem = BarangWishlist(
+            nama_barang=request.POST.get('nama_barang'),
+            harga_barang=request.POST.get('harga_barang'),
+            deskripsi=request.POST.get('deskripsi'),
+        )
+        newItem.save()
+    return HttpResponseRedirect(reverse('wishlist:submit_ajax'))

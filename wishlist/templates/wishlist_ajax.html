@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<nav class="navbar" style="background-color: lightgreen;">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">{{nama}}</span>
+      <a class="btn btn-outline-success" type="submit" href="{% url 'wishlist:logout' %}">Logout</a>
+    </div>
+  </nav>
+
+<table class = "table table-bordered w-auto" style="margin-left:auto; margin-right:auto; margin-top:25px;">
+    <thread style="background-color: cyan;"></thread>
+    <tr>
+    <th>Nama Barang</th>
+    <th>Harga Barang</th>
+    <th>Deskripsi</th>
+    </tr>
+    {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
+    {% for barang in list_barang %}
+        <tr>
+            <th>{{barang.nama_barang}}</th>
+            <th>{{barang.harga_barang}}</th>
+            <th>{{barang.deskripsi}}</th>
+        </tr>
+    {% endfor %}
+</table>
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+
+{% block meta %}
+<script>
+    function yaa(event){
+        event.prevenDefault()
+        $.post("/ajax/submit/"),
+            {
+                nama_barang : document.getElementById("nama_barang").value,
+                harga_barang : document.getElementById("harga_barang").value,
+                deskripsi: document.getElementById("deskripsi").value,
+            }
+        };
+        return false;
+    
+</script>
+<script type ="text/javascript">
+
+    function refresh() {
+        $.ajax({
+            type: "GET",
+            url: "/wishlist/json",
+            dataType:"json",
+            success: function(data){
+                datanya = data
+            }
+        });
+        return datanya;
+    }
+    function refresh2(){
+        var datanya = refresh();
+        var itemHtml = "<table> <tr> <th> Nama Barang</th>"
+        for (var i =0; i<datanya.length; i++){
+            var item = datanya[i].fields;
+            itemHtml += '<tr> <th>' + item.nama_barang+ '</th> <th>' + item.deskripsi + '</th> </tr>';
+        }
+        itemHtml += "</table>";
+        $('#lala').html(itemHtml);
+    }
+</script>
+{% endblock meta %}
+
+<h5>Nama: {{nama}}</h5>
+<br>
+<button onclick="refresh2()">get data</button>
+<div id="Lala"></div>
+<br>
+<br>
+<form method="POST" id="formnya" onsubmit="return yaa()">
+    {% csrf_token %}
+    <label for="nama_barang">Nama Barang:</label><br>
+    <input id="nama_barang" type="text" name="nama_barang"><br>
+    <label for="harga_barang">Harga Barang:</label><br>
+    <input id="harga_barang" type="number" name="harga_barang"><br>
+    <label for="deskripsi">Deskripsi:</label><br>
+    <input id="deskripsi" type="text" name="diskripsi">
+    <button type="submit">Submit</button>
+</form>
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+<button>Logout</button>
+
+{% endblock content %}
